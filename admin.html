@@ -214,6 +214,11 @@
       background: var(--gold-light);
       transform: translateY(-2px);
     }
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
     .support-link {
       display: inline-flex;
       align-items: center;
@@ -241,12 +246,72 @@
       75% { transform: translateX(5px); }
     }
     
+    /* LOGIN ANIMATION STATES */
+    .login-status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .login-status.verifying {
+      display: flex;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      animation: pulseBorder 1.5s infinite;
+    }
+    .login-status.success {
+      display: flex;
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      animation: slideIn 0.4s ease;
+    }
+    @keyframes pulseBorder {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(245, 158, 11, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--warning);
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .success-icon {
+      width: 18px;
+      height: 18px;
+      animation: checkmark 0.4s ease;
+    }
+    @keyframes checkmark {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
     /* DASHBOARD */
     .dashboard {
       display: none;
       padding: 80px 0 60px;
     }
-    .dashboard.active { display: block; }
+    .dashboard.active { display: block; animation: fadeIn 0.5s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     
     /* TABS */
     .tabs {
@@ -300,6 +365,11 @@
       display: flex;
       align-items: center;
       gap: 14px;
+      animation: slideUp 0.5s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .stat-icon {
       width: 50px;
@@ -353,6 +423,11 @@
       border: 1px solid rgba(212, 175, 55, 0.2);
       border-radius: 10px;
       transition: var(--transition);
+      animation: fadeInItem 0.4s ease;
+    }
+    @keyframes fadeInItem {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
     }
     .reservation-item:hover {
       border-color: var(--gold);
@@ -492,7 +567,6 @@
       gap: 6px;
     }
     .refresh-info i { color: var(--gold); animation: spin 2s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
     #lastUpdate {
       font-weight: 600;
       color: var(--gold-light);
@@ -638,6 +712,18 @@
       color: var(--gold-light);
     }
     
+    /* LOADING STATE */
+    .loading-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .loading-state i {
+      font-size: 2.5rem;
+      color: var(--gold);
+      animation: spin 1s linear infinite;
+      margin-bottom: 12px;
+    }
+    
     /* RESPONSIVE */
     @media (max-width: 480px) {
       .container { padding: 0 14px; }
@@ -687,9 +773,22 @@
             <label><i class="fas fa-lock"></i> Contraseña</label>
             <input type="password" class="form-control" id="passInput" placeholder="••••••••" required>
           </div>
-          <button type="submit" class="btn-login">
+          <button type="submit" class="btn-login" id="loginBtn">
             <i class="fas fa-sign-in-alt"></i> Ingresar al Panel
           </button>
+          
+          <!-- Login Status Messages -->
+          <div class="login-status verifying" id="verifyingStatus" style="display: none;">
+            <div class="spinner"></div>
+            <span>🔐 Verificando datos...</span>
+          </div>
+          <div class="login-status success" id="successStatus" style="display: none;">
+            <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <span>✅ ¡Acceso permitido!</span>
+          </div>
+          
           <p class="error-msg" id="errorMsg">
             <i class="fas fa-exclamation-circle"></i> Número o contraseña incorrectos
           </p>
@@ -755,9 +854,9 @@
         <div class="reservations-list">
           <h3><i class="fas fa-list"></i> Reservas de Hoy</h3>
           <div id="todayReservationsContainer">
-            <div class="empty-state">
-              <i class="fas fa-clipboard-list"></i>
-              <p>No hay reservas para hoy.<br>¡Esperamos tus primeros clientes!</p>
+            <div class="loading-state">
+              <i class="fas fa-spinner"></i>
+              <p>Cargando reservas...</p>
             </div>
           </div>
         </div>
@@ -768,9 +867,9 @@
         <div class="reservations-list">
           <h3><i class="fas fa-archive"></i> Historial de Reservas</h3>
           <div id="historyReservationsContainer">
-            <div class="empty-state">
-              <i class="fas fa-inbox"></i>
-              <p>No hay reservas anteriores registradas.<br>El historial aparecerá aquí automáticamente.</p>
+            <div class="loading-state">
+              <i class="fas fa-spinner"></i>
+              <p>Cargando historial...</p>
             </div>
           </div>
         </div>
@@ -828,7 +927,29 @@
     </div>
   </footer>
 
+  <!-- FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
   <script>
+    // ============================================
+    // 🔥 CONFIGURACIÓN DE FIREBASE
+    // ============================================
+    // ⚠️ IMPORTANTE: Reemplaza esto con tu propia configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4S-4DYJs2j1j97gH4upSc0ArszdUTjVs",
+      authDomain: "la-magia-del-barbero.firebaseapp.com",
+      projectId: "la-magia-del-barbero",
+      storageBucket: "la-magia-del-barbero.firebasestorage.app",
+      messagingSenderId: "709579833610",
+      appId: "1:709579833610:web:38b8d9cbfdae9b48c3faf3",
+      measurementId: "G-F7QEVZTSTT"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     // ===== CONFIGURACIÓN =====
     const ADMIN_CREDENTIALS = {
       phone: '930569195',
@@ -843,7 +964,10 @@
     const loginForm = document.getElementById('loginForm');
     const phoneInput = document.getElementById('phoneInput');
     const passInput = document.getElementById('passInput');
+    const loginBtn = document.getElementById('loginBtn');
     const errorMsg = document.getElementById('errorMsg');
+    const verifyingStatus = document.getElementById('verifyingStatus');
+    const successStatus = document.getElementById('successStatus');
     const logoutBtn = document.getElementById('logoutBtn');
     const logoutModal = document.getElementById('logoutModal');
     const cancelLogout = document.getElementById('cancelLogout');
@@ -873,12 +997,12 @@
     const confirmAction = document.getElementById('confirmAction');
     const actionBtnText = document.getElementById('actionBtnText');
     
-    // Variable para almacenar la acción pendiente
     let pendingAction = null;
+    let reservationsData = [];
 
     // ===== VERIFICAR SESIÓN AL CARGAR =====
     document.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('adminLoggedIn') === 'true') {
+      if (sessionStorage.getItem('adminLoggedIn') === 'true') {
         showDashboard();
         loadReservations();
         startAutoRefresh();
@@ -886,26 +1010,64 @@
       updateLastUpdateTime();
       setupTabs();
       setupActionModal();
+      
+      // Escuchar cambios en tiempo real de Firebase
+      database.ref('reservations').on('value', (snapshot) => {
+        const data = snapshot.val();
+        reservationsData = data ? Object.values(data) : [];
+        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+          loadReservations();
+        }
+      });
     });
 
-    // ===== LOGIN =====
+    // ===== LOGIN CON ANIMACIONES =====
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const phone = phoneInput.value.trim();
       const password = passInput.value;
       
-      if (phone === ADMIN_CREDENTIALS.phone && password === ADMIN_CREDENTIALS.password) {
-        localStorage.setItem('adminLoggedIn', 'true');
-        localStorage.setItem('adminLoginTime', new Date().toISOString());
-        errorMsg.classList.remove('show');
-        showDashboard();
-        loadReservations();
-        startAutoRefresh();
-      } else {
-        errorMsg.classList.add('show');
-        passInput.value = '';
-        passInput.focus();
-      }
+      // Ocultar mensajes previos
+      errorMsg.classList.remove('show');
+      successStatus.style.display = 'none';
+      
+      // Mostrar estado "Verificando datos..."
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<div class="spinner"></div> Verificando...';
+      verifyingStatus.style.display = 'flex';
+      
+      // Simular verificación (puedes ajustar el tiempo)
+      setTimeout(() => {
+        if (phone === ADMIN_CREDENTIALS.phone && password === ADMIN_CREDENTIALS.password) {
+          // Éxito - Mostrar "Acceso permitido"
+          verifyingStatus.style.display = 'none';
+          successStatus.style.display = 'flex';
+          
+          // Esperar animación y mostrar dashboard
+          setTimeout(() => {
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('adminLoginTime', new Date().toISOString());
+            showDashboard();
+            loadReservations();
+            startAutoRefresh();
+            
+            // Reset form
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar al Panel';
+            successStatus.style.display = 'none';
+            phoneInput.value = '';
+            passInput.value = '';
+          }, 1500);
+        } else {
+          // Error
+          verifyingStatus.style.display = 'none';
+          errorMsg.classList.add('show');
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar al Panel';
+          passInput.value = '';
+          passInput.focus();
+        }
+      }, 2000); // 2 segundos de "verificación"
     });
 
     // ===== MOSTRAR DASHBOARD =====
@@ -920,19 +1082,11 @@
       tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
           const tab = btn.dataset.tab;
-          
-          // Actualizar botones
           tabBtns.forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          
-          // Actualizar contenido
           tabContents.forEach(c => c.classList.remove('active'));
           document.getElementById(`tab-${tab}`).classList.add('active');
-          
-          // Mostrar/ocultar estadísticas (solo para hoy)
           statsSection.style.display = tab === 'today' ? 'grid' : 'none';
-          
-          // Recargar reservas si es necesario
           if (tab === 'history') {
             loadHistoryReservations();
           }
@@ -944,7 +1098,6 @@
     function setupActionModal() {
       cancelAction.addEventListener('click', closeActionModal);
       confirmAction.addEventListener('click', executePendingAction);
-      
       actionModal.addEventListener('click', (e) => {
         if (e.target === actionModal) closeActionModal();
       });
@@ -952,7 +1105,6 @@
 
     function openActionModal(type, reservationId, reservationName) {
       pendingAction = { type, reservationId };
-      
       if (type === 'confirm') {
         actionModalIcon.className = 'modal-icon success';
         actionModalIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
@@ -968,7 +1120,6 @@
         confirmAction.className = 'modal-btn action-cancel';
         actionBtnText.textContent = 'Sí, cancelar';
       }
-      
       actionModal.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -981,45 +1132,37 @@
 
     function executePendingAction() {
       if (!pendingAction) return;
-      
       const { type, reservationId } = pendingAction;
       updateReservationStatus(reservationId, type);
       closeActionModal();
-      loadReservations();
     }
 
-    // ===== ACTUALIZAR ESTADO DE RESERVA =====
+    // ===== ACTUALIZAR ESTADO DE RESERVA EN FIREBASE =====
     function updateReservationStatus(reservationId, newStatus) {
-      const reservations = JSON.parse(localStorage.getItem('barberReservations') || '[]');
-      const index = reservations.findIndex(r => r.id === reservationId);
-      
-      if (index !== -1) {
-        reservations[index].status = newStatus;
-        reservations[index].updatedAt = new Date().toISOString();
-        localStorage.setItem('barberReservations', JSON.stringify(reservations));
-        
-        // Notificar a otras pestañas
-        window.dispatchEvent(new Event('storage'));
-      }
+      database.ref('reservations/' + reservationId).update({
+        status: newStatus,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        loadReservations();
+      }).catch((error) => {
+        console.error('Error al actualizar:', error);
+        alert('❌ Error al actualizar la reserva');
+      });
     }
 
     // ===== CARGAR RESERVAS DE HOY =====
     function loadTodayReservations() {
-      const reservations = JSON.parse(localStorage.getItem('barberReservations') || '[]');
       const today = new Date().toISOString().split('T')[0];
-      const todayReservations = reservations.filter(r => r.date === today);
+      const todayReservations = reservationsData.filter(r => r.date === today);
       
-      // Calcular estadísticas
       const pendingToday = todayReservations.filter(r => r.status !== 'cancelled');
       const totalRevenue = pendingToday.reduce((sum, r) => sum + (r.price || 0), 0);
       const uniqueClients = [...new Set(pendingToday.map(r => r.name.toLowerCase()))].length;
       
-      // Actualizar contadores
       todayCountEl.textContent = pendingToday.length;
       revenueCountEl.textContent = `S/ ${totalRevenue}`;
       clientsCountEl.textContent = uniqueClients;
       
-      // Ordenar por hora
       const sorted = [...pendingToday].sort((a, b) => a.time.localeCompare(b.time));
       
       if (sorted.length === 0) {
@@ -1041,19 +1184,19 @@
         html += `
           <div class="reservation-item ${statusClass}" data-id="${res.id}">
             <div class="res-header">
-              <span class="res-client">${res.name}</span>
+              <span class="res-client">${escapeHtml(res.name)}</span>
               <span class="res-status ${status}">${statusText}</span>
             </div>
             <div class="res-details">
               <div class="res-row">
                 <i class="fas fa-cut"></i>
                 <strong>Servicio:</strong>
-                <span class="res-service">${res.service}</span>
+                <span class="res-service">${escapeHtml(res.service)}</span>
               </div>
               <div class="res-row">
                 <i class="fas fa-user"></i>
                 <strong>Profesional:</strong>
-                <span>${res.professional}</span>
+                <span>${escapeHtml(res.professional)}</span>
               </div>
               <div class="res-row">
                 <i class="fas fa-calendar"></i>
@@ -1068,7 +1211,7 @@
               <div class="res-row">
                 <i class="fas fa-phone"></i>
                 <strong>Teléfono:</strong>
-                <span>${res.phone}</span>
+                <span>${escapeHtml(res.phone)}</span>
               </div>
             </div>
             <div class="res-footer">
@@ -1094,13 +1237,10 @@
 
     // ===== CARGAR HISTORIAL DE RESERVAS =====
     function loadHistoryReservations() {
-      const reservations = JSON.parse(localStorage.getItem('barberReservations') || '[]');
       const today = new Date().toISOString().split('T')[0];
-      
-      // Filtrar reservas de días anteriores (excluyendo hoy)
-      const historyReservations = reservations
+      const historyReservations = reservationsData
         .filter(r => r.date < today)
-        .sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time)); // Más recientes primero
+        .sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
       
       if (historyReservations.length === 0) {
         historyContainer.innerHTML = `
@@ -1117,29 +1257,28 @@
         const status = res.status || 'pending';
         const statusClass = status === 'confirmed' ? 'confirmed' : status === 'cancelled' ? 'cancelled' : 'pending';
         const statusText = status === 'confirmed' ? 'Confirmada' : status === 'cancelled' ? 'Cancelada' : 'Pendiente';
-        const dateFormatted = formatDate(res.date);
         
         html += `
           <div class="reservation-item ${statusClass}" data-id="${res.id}">
             <div class="res-header">
-              <span class="res-client">${res.name}</span>
+              <span class="res-client">${escapeHtml(res.name)}</span>
               <span class="res-status ${status}">${statusText}</span>
             </div>
             <div class="res-details">
               <div class="res-row">
                 <i class="fas fa-cut"></i>
                 <strong>Servicio:</strong>
-                <span class="res-service">${res.service}</span>
+                <span class="res-service">${escapeHtml(res.service)}</span>
               </div>
               <div class="res-row">
                 <i class="fas fa-user"></i>
                 <strong>Profesional:</strong>
-                <span>${res.professional}</span>
+                <span>${escapeHtml(res.professional)}</span>
               </div>
               <div class="res-row">
                 <i class="fas fa-calendar"></i>
                 <strong>Fecha:</strong>
-                <span>${dateFormatted}</span>
+                <span>${formatDate(res.date)}</span>
               </div>
               <div class="res-row">
                 <i class="fas fa-clock"></i>
@@ -1149,7 +1288,7 @@
               <div class="res-row">
                 <i class="fas fa-phone"></i>
                 <strong>Teléfono:</strong>
-                <span>${res.phone}</span>
+                <span>${escapeHtml(res.phone)}</span>
               </div>
             </div>
             <div class="res-footer">
@@ -1173,10 +1312,9 @@
       updateLastUpdateTime();
     }
 
-    // ===== CARGAR TODAS LAS RESERVAS (según tab activo) =====
+    // ===== CARGAR TODAS LAS RESERVAS =====
     function loadReservations() {
       const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
-      
       if (activeTab === 'today') {
         loadTodayReservations();
       } else {
@@ -1190,14 +1328,15 @@
       return new Date(dateString).toLocaleDateString('es-PE', options).toUpperCase();
     }
 
-    // ===== ESCAPAR HTML PARA PREVENIR XSS =====
+    // ===== ESCAPAR HTML =====
     function escapeHtml(text) {
+      if (!text) return '';
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML.replace(/'/g, "\\'");
     }
 
-    // ===== ACTUALIZAR HORA DE ÚLTIMA ACTUALIZACIÓN (CON SEGUNDOS) =====
+    // ===== ACTUALIZAR HORA =====
     function updateLastUpdateTime() {
       const now = new Date();
       const timeStr = now.toLocaleTimeString('es-PE', { 
@@ -1209,29 +1348,28 @@
       lastUpdateEl.textContent = timeStr;
     }
 
-    // ===== AUTO-REFRESH CADA 10 SEGUNDOS =====
+    // ===== AUTO-REFRESH =====
     function startAutoRefresh() {
       setInterval(() => {
         loadReservations();
       }, AUTO_REFRESH_INTERVAL);
     }
 
-    // ===== MANEJAR ACCIONES (CONFIRMAR/CANCELAR) =====
+    // ===== MANEJAR ACCIONES =====
     window.handleAction = function(type, reservationId, reservationName) {
       openActionModal(type, reservationId, reservationName);
     };
 
-    // ===== LOGOUT CON CONFIRMACIÓN =====
+    // ===== LOGOUT =====
     logoutBtn.addEventListener('click', () => {
       logoutModal.classList.add('active');
       document.body.style.overflow = 'hidden';
     });
 
     cancelLogout.addEventListener('click', closeModal);
-    
     confirmLogout.addEventListener('click', () => {
-      localStorage.removeItem('adminLoggedIn');
-      localStorage.removeItem('adminLoginTime');
+      sessionStorage.removeItem('adminLoggedIn');
+      sessionStorage.removeItem('adminLoginTime');
       closeModal();
       dashboard.classList.remove('active');
       loginScreen.style.display = 'flex';
@@ -1256,22 +1394,8 @@
       }
     });
 
-    // ===== UTILIDADES =====
     phoneInput.addEventListener('input', (e) => {
       e.target.value = e.target.value.replace(/[^0-9]/g, '');
-    });
-
-    // ===== ESCUCHAR CAMBIOS EN LOCALSTORAGE =====
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'barberReservations' && localStorage.getItem('adminLoggedIn') === 'true') {
-        loadReservations();
-      }
-    });
-
-    window.addEventListener('reservationCreated', () => {
-      if (localStorage.getItem('adminLoggedIn') === 'true') {
-        loadReservations();
-      }
     });
   </script>
 </body>
