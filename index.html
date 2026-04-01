@@ -181,6 +181,11 @@
       background: var(--gold);
       color: var(--black);
     }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
 
     /* SECTIONS */
     section { padding: 60px 0; }
@@ -200,7 +205,7 @@
       font-size: 0.9rem;
     }
 
-    /* SERVICES - REDUCED SIZE */
+    /* SERVICES */
     .services-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -664,7 +669,7 @@
       text-decoration: none;
     }
 
-    /* FOOTER - LARGER LOGO */
+    /* FOOTER */
     footer {
       background: var(--black-light);
       padding: 40px 0 20px;
@@ -916,6 +921,20 @@
       color: var(--black);
     }
 
+    /* LOADING SPINNER */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(10, 10, 10, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--black);
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
       .mobile-toggle { display: block; }
@@ -1137,7 +1156,7 @@
     </div>
   </section>
 
-  <!-- Professionals - NUEVO DISEÑO -->
+  <!-- Professionals -->
   <section id="profesionales" style="background: var(--black-light); padding: 60px 0;">
     <div class="container">
       <div class="section-title">
@@ -1367,7 +1386,7 @@
             </div>
           </div>
 
-          <button class="btn" onclick="confirmBooking()" style="width: 100%; justify-content: center; margin-top: 10px; font-size: 1.1rem; padding: 15px;">
+          <button class="btn" id="confirmBookingBtn" onclick="confirmBooking()" style="width: 100%; justify-content: center; margin-top: 10px; font-size: 1.1rem; padding: 15px;">
             <i class="fas fa-check-circle"></i> CONFIRMAR RESERVA
           </button>
         </div>
@@ -1376,11 +1395,11 @@
           <div class="confirmation-icon">
             <i class="fas fa-check"></i>
           </div>
-          <h3>CONFIRMA TU CITA</h3>
-          <p>Estás apunto de reservar tu cita</p>
+          <h3>✅ RESERVA ENVIADA</h3>
+          <p>Tu reserva ha sido registrada exitosamente en nuestro sistema</p>
           
           <div class="confirmation-note">
-            <i class="fas fa-info-circle"></i> <strong>Importante:</strong> Haz clic en el botón de abajo para enviar tu confirmación directamente por WhatsApp. ¡Es rápido y seguro!
+            <i class="fas fa-info-circle"></i> <strong>Importante:</strong> Haz clic en el botón de abajo para enviar tu confirmación directamente por WhatsApp al profesional. ¡Es rápido y seguro!
           </div>
           
           <a href="#" class="whatsapp-confirm" id="whatsappLink" target="_blank">
@@ -1492,7 +1511,30 @@
     </div>
   </div>
 
+  <!-- FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
   <script>
+    // ============================================
+    // 🔥 CONFIGURACIÓN DE FIREBASE
+    // ============================================
+    // ⚠️ IMPORTANTE: Reemplaza esto con tu propia configuración de Firebase
+    // Ve a https://console.firebase.google.com/ y crea un proyecto
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY_AQUI",
+      authDomain: "tu-proyecto.firebaseapp.com",
+      databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
+      projectId: "tu-proyecto",
+      storageBucket: "tu-proyecto.appspot.com",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:abcdef1234567890"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     // Set year
     document.getElementById('year').textContent = new Date().getFullYear();
     
@@ -1577,8 +1619,8 @@
       }
     });
     
-    // Confirm booking - VALIDATION + WHATSAPP REDIRECT + GUARDAR EN LOCALSTORAGE
-    function confirmBooking() {
+    // Confirm booking - FIREBASE INTEGRATION
+    async function confirmBooking() {
       const service = document.getElementById('service').value;
       const professional = document.getElementById('professional').value;
       const date = document.getElementById('date').value;
@@ -1586,8 +1628,9 @@
       const name = document.getElementById('name').value;
       const phone = document.getElementById('phone').value;
       const email = document.getElementById('email').value;
+      const confirmBtn = document.getElementById('confirmBookingBtn');
       
-      // VALIDACIÓN: Si faltan campos, mostrar modal decorado
+      // VALIDACIÓN: Si faltan campos, mostrar modal
       if (!service || !professional || !date || !time || !name || !phone) {
         showModal();
         return;
@@ -1596,63 +1639,71 @@
       const [serviceName, price] = service.split('|');
       const [profName, profPhone] = professional.split('|');
       
-      // Format date nicely
-      const dateObj = new Date(date);
-      const dateFormatted = dateObj.toLocaleDateString('es-PE', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      }).toUpperCase();
+      // Disable button during submission
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<span class="loading-spinner"></span> ENVIANDO...';
       
-      // Create WhatsApp message with emojis and professional formatting
-      const message = `*🔥 ¡𝐍𝐔𝐄𝐕𝐀 𝐑𝐄𝐒𝐄𝐑𝐕𝐀 𝐂𝐎𝐍𝐅𝐈𝐑𝐌𝐀𝐃𝐀! 🔥*%0A%0A` +
-        `*📋 SERVICIO:* ${serviceName.toUpperCase()}%0A` +
-        `*💰 PRECIO:* S/ ${price}%0A%0A` +
-        `*👤 PROFESIONAL:* ${profName.toUpperCase()}%0A%0A` +
-        `*📅 FECHA:* ${dateFormatted}%0A` +
-        `*⏰ HORA:* ${time}%0A%0A` +
-        `*👤 CLIENTE:* ${name.toUpperCase()}%0A` +
-        `*📱 TELÉFONO:* ${phone}%0A` +
-        `${email ? `*📧 EMAIL:* ${email}%0A` : ''}%0A` +
-        `*✨ ¡Estaré ahi puntual, Gracias! ✨*`;
-      
-      // Set WhatsApp link with the professional's number - DIRECT REDIRECT
-      const whatsappURL = `https://wa.me/${profPhone}?text=${message}`;
-      
-      // GUARDAR RESERVA EN LOCALSTORAGE PARA EL PANEL ADMIN
-      const reservation = {
-        id: Date.now(),
-        service: serviceName,
-        price: parseInt(price),
-        professional: profName,
-        date: date,
-        time: time,
-        name: name,
-        phone: phone,
-        email: email || '',
-        createdAt: new Date().toISOString()
-      };
-      
-      // Obtener reservas existentes o crear array vacío
-      const existingReservations = JSON.parse(localStorage.getItem('barberReservations') || '[]');
-      existingReservations.push(reservation);
-      localStorage.setItem('barberReservations', JSON.stringify(existingReservations));
-      
-      // Dispatch event para notificar al admin panel en otra pestaña
-      window.dispatchEvent(new Event('storage'));
-      
-      // Show confirmation UI first
-      document.getElementById('bookingForm').style.display = 'none';
-      document.getElementById('confirmation').classList.add('active');
-      document.getElementById('confirmation').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Auto-redirect to WhatsApp after 1.5 seconds (user sees confirmation first)
-      setTimeout(() => {
-        document.getElementById('whatsappLink').href = whatsappURL;
-        // Auto-click the WhatsApp button for seamless redirect
-        document.getElementById('whatsappLink').click();
-      }, 1500);
+      try {
+        // Create reservation object
+        const reservation = {
+          id: Date.now(),
+          service: serviceName,
+          price: parseInt(price),
+          professional: profName,
+          professionalPhone: profPhone,
+          date: date,
+          time: time,
+          name: name,
+          phone: phone,
+          email: email || '',
+          status: 'pending',
+          createdAt: firebase.database.ServerValue.TIMESTAMP,
+          updatedAt: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        // Save to Firebase
+        await database.ref('reservations/' + reservation.id).set(reservation);
+        
+        // Format date for WhatsApp
+        const dateObj = new Date(date);
+        const dateFormatted = dateObj.toLocaleDateString('es-PE', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        }).toUpperCase();
+        
+        // Create WhatsApp message
+        const message = `*🔥 ¡𝐍𝐔𝐄𝐕𝐀 𝐑𝐄𝐒𝐄𝐑𝐕𝐀 𝐂𝐎𝐍𝐅𝐈𝐑𝐌𝐀𝐃𝐀! 🔥*%0A%0A` +
+          `*📋 SERVICIO:* ${serviceName.toUpperCase()}%0A` +
+          `*💰 PRECIO:* S/ ${price}%0A%0A` +
+          `*👤 PROFESIONAL:* ${profName.toUpperCase()}%0A%0A` +
+          `*📅 FECHA:* ${dateFormatted}%0A` +
+          `*⏰ HORA:* ${time}%0A%0A` +
+          `*👤 CLIENTE:* ${name.toUpperCase()}%0A` +
+          `*📱 TELÉFONO:* ${phone}%0A` +
+          `${email ? `*📧 EMAIL:* ${email}%0A` : ''}%0A` +
+          `*✨ ¡Estaré ahi puntual, Gracias! ✨*`;
+        
+        const whatsappURL = `https://wa.me/${profPhone}?text=${message}`;
+        
+        // Show confirmation
+        document.getElementById('bookingForm').style.display = 'none';
+        document.getElementById('confirmation').classList.add('active');
+        document.getElementById('confirmation').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Set WhatsApp link and auto-click after delay
+        setTimeout(() => {
+          document.getElementById('whatsappLink').href = whatsappURL;
+          document.getElementById('whatsappLink').click();
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Error al guardar reserva:', error);
+        alert('❌ Error al guardar la reserva. Por favor intenta nuevamente o contacta por WhatsApp.');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> CONFIRMAR RESERVA';
+      }
     }
     
     // Reset form
@@ -1667,6 +1718,8 @@
       document.getElementById('phone').value = '';
       document.getElementById('email').value = '';
       document.getElementById('summary').style.display = 'none';
+      document.getElementById('confirmBookingBtn').disabled = false;
+      document.getElementById('confirmBookingBtn').innerHTML = '<i class="fas fa-check-circle"></i> CONFIRMAR RESERVA';
       document.getElementById('bookingForm').scrollIntoView({ behavior: 'smooth' });
     }
     
