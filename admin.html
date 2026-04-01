@@ -28,6 +28,7 @@
       --gray-light: #e0e0e0;
       --danger: #ef4444;
       --success: #22c55e;
+      --warning: #f59e0b;
       --transition: all 0.3s ease;
     }
     
@@ -247,6 +248,44 @@
     }
     .dashboard.active { display: block; }
     
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: rgba(21, 21, 21, 0.9);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      color: var(--gray-light);
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .tab-btn.active {
+      background: var(--gold);
+      color: var(--black);
+    }
+    .tab-btn:hover:not(.active) {
+      color: var(--gold);
+    }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* Estadísticas */
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -290,6 +329,7 @@
       margin-top: 2px;
     }
     
+    /* Lista de Reservas */
     .reservations-list {
       background: rgba(21, 21, 21, 0.9);
       border: 1px solid rgba(212, 175, 55, 0.3);
@@ -305,31 +345,129 @@
       align-items: center;
       gap: 8px;
     }
+    
     .reservation-item {
-      padding: 12px 0;
-      border-bottom: 1px dashed rgba(255,255,255,0.1);
+      padding: 14px;
+      margin-bottom: 12px;
+      background: rgba(26, 26, 26, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 10px;
+      transition: var(--transition);
+    }
+    .reservation-item:hover {
+      border-color: var(--gold);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+    }
+    .reservation-item.confirmed {
+      border-left: 4px solid var(--success);
+      background: rgba(34, 197, 94, 0.08);
+    }
+    .reservation-item.cancelled {
+      border-left: 4px solid var(--danger);
+      background: rgba(239, 68, 68, 0.08);
+      opacity: 0.7;
+    }
+    
+    .res-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(255,255,255,0.1);
     }
-    .reservation-item:last-child { border-bottom: none; }
-    .res-details h4 {
-      font-size: 0.95rem;
+    .res-client {
+      font-weight: 700;
+      font-size: 1rem;
       color: var(--white);
-      margin-bottom: 4px;
     }
-    .res-details p {
-      font-size: 0.8rem;
+    .res-status {
+      padding: 4px 10px;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .res-status.pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .res-status.confirmed { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+    .res-status.cancelled { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    
+    .res-details {
+      margin-bottom: 12px;
+    }
+    .res-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0;
+      font-size: 0.85rem;
       color: var(--gray-light);
-      line-height: 1.4;
+    }
+    .res-row i {
+      color: var(--gold);
+      width: 16px;
+      text-align: center;
+    }
+    .res-row strong {
+      color: var(--white);
+      margin-right: 4px;
+    }
+    .res-service {
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+    
+    .res-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255,255,255,0.1);
     }
     .res-price {
       font-weight: 700;
       color: var(--gold);
-      font-size: 1rem;
-      white-space: nowrap;
+      font-size: 1.1rem;
     }
+    
+    .res-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-action {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-confirm {
+      background: var(--success);
+      color: white;
+    }
+    .btn-confirm:hover {
+      background: #16a34a;
+      transform: translateY(-2px);
+    }
+    .btn-cancel {
+      background: var(--danger);
+      color: white;
+    }
+    .btn-cancel:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+    }
+    .btn-action:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
     .empty-state {
       text-align: center;
       padding: 30px 20px;
@@ -361,7 +499,7 @@
       font-family: monospace;
     }
     
-    /* MODAL CONFIRMACIÓN SALIDA */
+    /* MODAL CONFIRMACIÓN SALIDA / ACCIONES */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -402,7 +540,6 @@
     .modal-icon {
       width: 65px;
       height: 65px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -410,6 +547,18 @@
       margin: 0 auto 18px;
       font-size: 1.6rem;
       color: var(--black);
+    }
+    .modal-icon.warning {
+      background: linear-gradient(135deg, var(--warning), #d97706);
+    }
+    .modal-icon.danger {
+      background: linear-gradient(135deg, var(--danger), #b91c1c);
+    }
+    .modal-icon.success {
+      background: linear-gradient(135deg, var(--success), #15803d);
+    }
+    .modal-icon.gold {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
     }
     .modal-title {
       font-size: 1.3rem;
@@ -457,6 +606,20 @@
       border-color: var(--gold);
       color: var(--gold);
     }
+    .modal-btn.action-confirm {
+      background: var(--success);
+      color: white;
+    }
+    .modal-btn.action-confirm:hover {
+      background: #16a34a;
+    }
+    .modal-btn.action-cancel {
+      background: var(--danger);
+      color: white;
+    }
+    .modal-btn.action-cancel:hover {
+      background: #dc2626;
+    }
     
     /* FOOTER */
     .admin-footer {
@@ -482,9 +645,11 @@
       .stat-card { padding: 16px; }
       .stat-icon { width: 45px; height: 45px; font-size: 1.2rem; }
       .stat-info .value { font-size: 1.4rem; }
-      .reservation-item { padding: 10px 0; }
-      .res-details h4 { font-size: 0.9rem; }
-      .res-details p { font-size: 0.75rem; }
+      .reservation-item { padding: 12px; }
+      .res-client { font-size: 0.95rem; }
+      .res-row { font-size: 0.8rem; }
+      .btn-action { padding: 7px 12px; font-size: 0.75rem; }
+      .res-price { font-size: 1rem; }
     }
   </style>
 </head>
@@ -541,8 +706,18 @@
   <!-- Dashboard -->
   <main class="dashboard" id="dashboard">
     <div class="container">
-      <!-- Estadísticas -->
-      <div class="stats-grid">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="today">
+          <i class="fas fa-calendar-day"></i> Hoy
+        </button>
+        <button class="tab-btn" data-tab="history">
+          <i class="fas fa-history"></i> Historial
+        </button>
+      </div>
+      
+      <!-- Estadísticas (solo para hoy) -->
+      <div class="stats-grid" id="statsSection">
         <div class="stat-card">
           <div class="stat-icon">
             <i class="fas fa-calendar-check"></i>
@@ -575,13 +750,28 @@
         </div>
       </div>
 
-      <!-- Lista de Reservas -->
-      <div class="reservations-list">
-        <h3><i class="fas fa-list"></i> Reservas de Hoy</h3>
-        <div id="reservationsContainer">
-          <div class="empty-state">
-            <i class="fas fa-clipboard-list"></i>
-            <p>No hay reservas registradas aún.<br>Las nuevas aparecerán aquí automáticamente.</p>
+      <!-- Contenido: Reservas de Hoy -->
+      <div class="tab-content active" id="tab-today">
+        <div class="reservations-list">
+          <h3><i class="fas fa-list"></i> Reservas de Hoy</h3>
+          <div id="todayReservationsContainer">
+            <div class="empty-state">
+              <i class="fas fa-clipboard-list"></i>
+              <p>No hay reservas para hoy.<br>¡Esperamos tus primeros clientes!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido: Historial -->
+      <div class="tab-content" id="tab-history">
+        <div class="reservations-list">
+          <h3><i class="fas fa-archive"></i> Historial de Reservas</h3>
+          <div id="historyReservationsContainer">
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>No hay reservas anteriores registradas.<br>El historial aparecerá aquí automáticamente.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -595,7 +785,7 @@
   <!-- Modal Confirmación Salida -->
   <div class="modal-overlay" id="logoutModal">
     <div class="modal-content">
-      <div class="modal-icon">
+      <div class="modal-icon gold">
         <i class="fas fa-exclamation-triangle"></i>
       </div>
       <h3 class="modal-title">¿Confirmar salida?</h3>
@@ -606,6 +796,25 @@
         </button>
         <button class="modal-btn confirm" id="confirmLogout">
           <i class="fas fa-check"></i> Sí, salir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar/Cancelar Reserva -->
+  <div class="modal-overlay" id="actionModal">
+    <div class="modal-content">
+      <div class="modal-icon" id="actionModalIcon">
+        <i class="fas fa-question-circle"></i>
+      </div>
+      <h3 class="modal-title" id="actionModalTitle">¿Confirmar acción?</h3>
+      <p class="modal-text" id="actionModalText">¿Estás seguro de realizar esta acción?</p>
+      <div class="modal-buttons">
+        <button class="modal-btn cancel" id="cancelAction">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button class="modal-btn" id="confirmAction">
+          <i class="fas fa-check"></i> <span id="actionBtnText">Confirmar</span>
         </button>
       </div>
     </div>
@@ -625,7 +834,6 @@
       phone: '930569195',
       password: 'BerMatCode'
     };
-    const SUPPORT_WHATSAPP = '51930569195';
     const AUTO_REFRESH_INTERVAL = 10000; // 10 segundos
 
     // ===== ELEMENTOS DOM =====
@@ -640,11 +848,33 @@
     const logoutModal = document.getElementById('logoutModal');
     const cancelLogout = document.getElementById('cancelLogout');
     const confirmLogout = document.getElementById('confirmLogout');
-    const reservationsContainer = document.getElementById('reservationsContainer');
+    
+    // Tabs
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const statsSection = document.getElementById('statsSection');
+    
+    // Contenedores de reservas
+    const todayContainer = document.getElementById('todayReservationsContainer');
+    const historyContainer = document.getElementById('historyReservationsContainer');
+    
+    // Estadísticas
     const todayCountEl = document.getElementById('todayCount');
     const revenueCountEl = document.getElementById('revenueCount');
     const clientsCountEl = document.getElementById('clientsCount');
     const lastUpdateEl = document.getElementById('lastUpdate');
+    
+    // Modal de acciones
+    const actionModal = document.getElementById('actionModal');
+    const actionModalIcon = document.getElementById('actionModalIcon');
+    const actionModalTitle = document.getElementById('actionModalTitle');
+    const actionModalText = document.getElementById('actionModalText');
+    const cancelAction = document.getElementById('cancelAction');
+    const confirmAction = document.getElementById('confirmAction');
+    const actionBtnText = document.getElementById('actionBtnText');
+    
+    // Variable para almacenar la acción pendiente
+    let pendingAction = null;
 
     // ===== VERIFICAR SESIÓN AL CARGAR =====
     document.addEventListener('DOMContentLoaded', () => {
@@ -654,6 +884,8 @@
         startAutoRefresh();
       }
       updateLastUpdateTime();
+      setupTabs();
+      setupActionModal();
     });
 
     // ===== LOGIN =====
@@ -683,67 +915,286 @@
       adminHeader.style.display = 'flex';
     }
 
-    // ===== CARGAR RESERVAS (DESDE LOCALSTORAGE) =====
-    function loadReservations() {
-      const reservations = JSON.parse(localStorage.getItem('barberReservations') || '[]');
-      
-      if (reservations.length === 0) {
-        reservationsContainer.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-clipboard-list"></i>
-            <p>No hay reservas registradas aún.<br>Las nuevas aparecerán aquí automáticamente.</p>
-          </div>
-        `;
-        todayCountEl.textContent = '0';
-        revenueCountEl.textContent = 'S/ 0';
-        clientsCountEl.textContent = '0';
-        return;
-      }
+    // ===== CONFIGURAR TABS =====
+    function setupTabs() {
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.tab;
+          
+          // Actualizar botones
+          tabBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          
+          // Actualizar contenido
+          tabContents.forEach(c => c.classList.remove('active'));
+          document.getElementById(`tab-${tab}`).classList.add('active');
+          
+          // Mostrar/ocultar estadísticas (solo para hoy)
+          statsSection.style.display = tab === 'today' ? 'grid' : 'none';
+          
+          // Recargar reservas si es necesario
+          if (tab === 'history') {
+            loadHistoryReservations();
+          }
+        });
+      });
+    }
 
-      // Filtrar reservas de hoy
+    // ===== CONFIGURAR MODAL DE ACCIONES =====
+    function setupActionModal() {
+      cancelAction.addEventListener('click', closeActionModal);
+      confirmAction.addEventListener('click', executePendingAction);
+      
+      actionModal.addEventListener('click', (e) => {
+        if (e.target === actionModal) closeActionModal();
+      });
+    }
+
+    function openActionModal(type, reservationId, reservationName) {
+      pendingAction = { type, reservationId };
+      
+      if (type === 'confirm') {
+        actionModalIcon.className = 'modal-icon success';
+        actionModalIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+        actionModalTitle.textContent = '¿Confirmar reserva?';
+        actionModalText.textContent = `¿Estás seguro de confirmar la reserva de ${reservationName}? Esta acción no se puede deshacer.`;
+        confirmAction.className = 'modal-btn action-confirm';
+        actionBtnText.textContent = 'Sí, confirmar';
+      } else if (type === 'cancel') {
+        actionModalIcon.className = 'modal-icon danger';
+        actionModalIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+        actionModalTitle.textContent = '¿Cancelar reserva?';
+        actionModalText.textContent = `¿Estás seguro de cancelar la reserva de ${reservationName}? El cliente será notificado.`;
+        confirmAction.className = 'modal-btn action-cancel';
+        actionBtnText.textContent = 'Sí, cancelar';
+      }
+      
+      actionModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeActionModal() {
+      actionModal.classList.remove('active');
+      document.body.style.overflow = '';
+      pendingAction = null;
+    }
+
+    function executePendingAction() {
+      if (!pendingAction) return;
+      
+      const { type, reservationId } = pendingAction;
+      updateReservationStatus(reservationId, type);
+      closeActionModal();
+      loadReservations();
+    }
+
+    // ===== ACTUALIZAR ESTADO DE RESERVA =====
+    function updateReservationStatus(reservationId, newStatus) {
+      const reservations = JSON.parse(localStorage.getItem('barberReservations') || '[]');
+      const index = reservations.findIndex(r => r.id === reservationId);
+      
+      if (index !== -1) {
+        reservations[index].status = newStatus;
+        reservations[index].updatedAt = new Date().toISOString();
+        localStorage.setItem('barberReservations', JSON.stringify(reservations));
+        
+        // Notificar a otras pestañas
+        window.dispatchEvent(new Event('storage'));
+      }
+    }
+
+    // ===== CARGAR RESERVAS DE HOY =====
+    function loadTodayReservations() {
+      const reservations = JSON.parse(localStorage.getItem('barberReservations') || '[]');
       const today = new Date().toISOString().split('T')[0];
       const todayReservations = reservations.filter(r => r.date === today);
       
       // Calcular estadísticas
-      const totalRevenue = todayReservations.reduce((sum, r) => sum + (r.price || 0), 0);
-      const uniqueClients = [...new Set(reservations.map(r => r.name.toLowerCase()))].length;
+      const pendingToday = todayReservations.filter(r => r.status !== 'cancelled');
+      const totalRevenue = pendingToday.reduce((sum, r) => sum + (r.price || 0), 0);
+      const uniqueClients = [...new Set(pendingToday.map(r => r.name.toLowerCase()))].length;
       
       // Actualizar contadores
-      todayCountEl.textContent = todayReservations.length;
+      todayCountEl.textContent = pendingToday.length;
       revenueCountEl.textContent = `S/ ${totalRevenue}`;
       clientsCountEl.textContent = uniqueClients;
       
-      // Generar lista de reservas de hoy (ordenadas por hora)
-      const sortedToday = [...todayReservations].sort((a, b) => a.time.localeCompare(b.time));
+      // Ordenar por hora
+      const sorted = [...pendingToday].sort((a, b) => a.time.localeCompare(b.time));
       
-      if (sortedToday.length === 0) {
-        reservationsContainer.innerHTML = `
+      if (sorted.length === 0) {
+        todayContainer.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-calendar-day"></i>
-            <p>No hay reservas para hoy.<br>¡Esperamos tus primeros clientes!</p>
+            <p>No hay reservas pendientes para hoy.<br>¡Esperamos tus primeros clientes!</p>
           </div>
         `;
         return;
       }
       
       let html = '';
-      
-      sortedToday.forEach(res => {
+      sorted.forEach(res => {
+        const status = res.status || 'pending';
+        const statusClass = status === 'confirmed' ? 'confirmed' : status === 'cancelled' ? 'cancelled' : 'pending';
+        const statusText = status === 'confirmed' ? 'Confirmada' : status === 'cancelled' ? 'Cancelada' : 'Pendiente';
+        
         html += `
-          <div class="reservation-item">
-            <div class="res-details">
-              <h4>${res.name}</h4>
-              <p><i class="fas fa-cut"></i> ${res.service}</p>
-              <p><i class="fas fa-clock"></i> ${res.time} • <i class="fas fa-user"></i> ${res.professional}</p>
-              <p style="font-size:0.75rem;color:var(--gray);"><i class="fas fa-phone"></i> ${res.phone}</p>
+          <div class="reservation-item ${statusClass}" data-id="${res.id}">
+            <div class="res-header">
+              <span class="res-client">${res.name}</span>
+              <span class="res-status ${status}">${statusText}</span>
             </div>
-            <div class="res-price">S/ ${res.price}</div>
+            <div class="res-details">
+              <div class="res-row">
+                <i class="fas fa-cut"></i>
+                <strong>Servicio:</strong>
+                <span class="res-service">${res.service}</span>
+              </div>
+              <div class="res-row">
+                <i class="fas fa-user"></i>
+                <strong>Profesional:</strong>
+                <span>${res.professional}</span>
+              </div>
+              <div class="res-row">
+                <i class="fas fa-calendar"></i>
+                <strong>Fecha:</strong>
+                <span>${formatDate(res.date)}</span>
+              </div>
+              <div class="res-row">
+                <i class="fas fa-clock"></i>
+                <strong>Hora:</strong>
+                <span>${res.time}</span>
+              </div>
+              <div class="res-row">
+                <i class="fas fa-phone"></i>
+                <strong>Teléfono:</strong>
+                <span>${res.phone}</span>
+              </div>
+            </div>
+            <div class="res-footer">
+              <span class="res-price">S/ ${res.price}</span>
+              ${status === 'pending' ? `
+                <div class="res-actions">
+                  <button class="btn-action btn-confirm" onclick="handleAction('confirm', ${res.id}, '${escapeHtml(res.name)}')">
+                    <i class="fas fa-check"></i> Confirmar
+                  </button>
+                  <button class="btn-action btn-cancel" onclick="handleAction('cancel', ${res.id}, '${escapeHtml(res.name)}')">
+                    <i class="fas fa-times"></i> Cancelar
+                  </button>
+                </div>
+              ` : ''}
+            </div>
           </div>
         `;
       });
       
-      reservationsContainer.innerHTML = html;
+      todayContainer.innerHTML = html;
       updateLastUpdateTime();
+    }
+
+    // ===== CARGAR HISTORIAL DE RESERVAS =====
+    function loadHistoryReservations() {
+      const reservations = JSON.parse(localStorage.getItem('barberReservations') || '[]');
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Filtrar reservas de días anteriores (excluyendo hoy)
+      const historyReservations = reservations
+        .filter(r => r.date < today)
+        .sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time)); // Más recientes primero
+      
+      if (historyReservations.length === 0) {
+        historyContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No hay reservas anteriores registradas.<br>El historial aparecerá aquí automáticamente.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      historyReservations.forEach(res => {
+        const status = res.status || 'pending';
+        const statusClass = status === 'confirmed' ? 'confirmed' : status === 'cancelled' ? 'cancelled' : 'pending';
+        const statusText = status === 'confirmed' ? 'Confirmada' : status === 'cancelled' ? 'Cancelada' : 'Pendiente';
+        const dateFormatted = formatDate(res.date);
+        
+        html += `
+          <div class="reservation-item ${statusClass}" data-id="${res.id}">
+            <div class="res-header">
+              <span class="res-client">${res.name}</span>
+              <span class="res-status ${status}">${statusText}</span>
+            </div>
+            <div class="res-details">
+              <div class="res-row">
+                <i class="fas fa-cut"></i>
+                <strong>Servicio:</strong>
+                <span class="res-service">${res.service}</span>
+              </div>
+              <div class="res-row">
+                <i class="fas fa-user"></i>
+                <strong>Profesional:</strong>
+                <span>${res.professional}</span>
+              </div>
+              <div class="res-row">
+                <i class="fas fa-calendar"></i>
+                <strong>Fecha:</strong>
+                <span>${dateFormatted}</span>
+              </div>
+              <div class="res-row">
+                <i class="fas fa-clock"></i>
+                <strong>Hora:</strong>
+                <span>${res.time}</span>
+              </div>
+              <div class="res-row">
+                <i class="fas fa-phone"></i>
+                <strong>Teléfono:</strong>
+                <span>${res.phone}</span>
+              </div>
+            </div>
+            <div class="res-footer">
+              <span class="res-price">S/ ${res.price}</span>
+              ${status === 'pending' ? `
+                <div class="res-actions">
+                  <button class="btn-action btn-confirm" onclick="handleAction('confirm', ${res.id}, '${escapeHtml(res.name)}')">
+                    <i class="fas fa-check"></i> Confirmar
+                  </button>
+                  <button class="btn-action btn-cancel" onclick="handleAction('cancel', ${res.id}, '${escapeHtml(res.name)}')">
+                    <i class="fas fa-times"></i> Cancelar
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      });
+      
+      historyContainer.innerHTML = html;
+      updateLastUpdateTime();
+    }
+
+    // ===== CARGAR TODAS LAS RESERVAS (según tab activo) =====
+    function loadReservations() {
+      const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+      
+      if (activeTab === 'today') {
+        loadTodayReservations();
+      } else {
+        loadHistoryReservations();
+      }
+    }
+
+    // ===== FORMATEAR FECHA =====
+    function formatDate(dateString) {
+      const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+      return new Date(dateString).toLocaleDateString('es-PE', options).toUpperCase();
+    }
+
+    // ===== ESCAPAR HTML PARA PREVENIR XSS =====
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML.replace(/'/g, "\\'");
     }
 
     // ===== ACTUALIZAR HORA DE ÚLTIMA ACTUALIZACIÓN (CON SEGUNDOS) =====
@@ -765,6 +1216,11 @@
       }, AUTO_REFRESH_INTERVAL);
     }
 
+    // ===== MANEJAR ACCIONES (CONFIRMAR/CANCELAR) =====
+    window.handleAction = function(type, reservationId, reservationName) {
+      openActionModal(type, reservationId, reservationName);
+    };
+
     // ===== LOGOUT CON CONFIRMACIÓN =====
     logoutBtn.addEventListener('click', () => {
       logoutModal.classList.add('active');
@@ -777,7 +1233,6 @@
       localStorage.removeItem('adminLoggedIn');
       localStorage.removeItem('adminLoginTime');
       closeModal();
-      // Redirigir al login
       dashboard.classList.remove('active');
       loginScreen.style.display = 'flex';
       adminHeader.style.display = 'none';
@@ -790,32 +1245,29 @@
       document.body.style.overflow = '';
     }
 
-    // Cerrar modal al hacer clic fuera
     logoutModal.addEventListener('click', (e) => {
       if (e.target === logoutModal) closeModal();
     });
 
-    // Soporte para tecla Escape
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && logoutModal.classList.contains('active')) {
-        closeModal();
+      if (e.key === 'Escape') {
+        if (logoutModal.classList.contains('active')) closeModal();
+        if (actionModal.classList.contains('active')) closeActionModal();
       }
     });
 
     // ===== UTILIDADES =====
-    // Permitir solo números en el campo de teléfono
     phoneInput.addEventListener('input', (e) => {
       e.target.value = e.target.value.replace(/[^0-9]/g, '');
     });
 
-    // ===== ESCUCHAR CAMBIOS EN LOCALSTORAGE (PARA ACTUALIZACIÓN EN TIEMPO REAL ENTRE PESTAÑAS) =====
+    // ===== ESCUCHAR CAMBIOS EN LOCALSTORAGE =====
     window.addEventListener('storage', (e) => {
       if (e.key === 'barberReservations' && localStorage.getItem('adminLoggedIn') === 'true') {
         loadReservations();
       }
     });
 
-    // También escuchar eventos personalizados para misma pestaña
     window.addEventListener('reservationCreated', () => {
       if (localStorage.getItem('adminLoggedIn') === 'true') {
         loadReservations();
