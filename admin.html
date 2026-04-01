@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="description" content="Panel de Administración - La Magia del Barbero">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin | La Magia del Barbero</title>
+  
+  <!-- ICONO -->
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/25vB9Z3y/17749596456a35.png">
+  
+  <!-- FUENTES Y ICONOS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --black-light: #1a1a1a;
+      --black-card: #151515;
+      --gold: #d4af37;
+      --gold-light: #e6c35c;
+      --white: #ffffff;
+      --gray: #888888;
+      --gray-light: #e0e0e0;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --transition: all 0.3s ease;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      line-height: 1.5;
+      font-size: 14px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* FONDO DIFUMINADO */
+    .admin-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(10,10,10,0.92), rgba(26,26,26,0.88)), 
+                  url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px);
+      z-index: -2;
+    }
+    .admin-bg::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 10, 0.85);
+      z-index: -1;
+    }
+    
+    h1, h2, h3, h4 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    
+    /* HEADER ADMIN */
+    .admin-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 12px 0;
+      border-bottom: 2px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .admin-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .admin-logo img {
+      height: 40px;
+      width: auto;
+    }
+    .admin-logo span { color: var(--gold); }
+    .admin-logout-btn {
+      background: transparent;
+      border: 2px solid var(--danger);
+      color: var(--danger);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .admin-logout-btn:hover {
+      background: var(--danger);
+      color: white;
+    }
+    
+    /* LOGIN SCREEN */
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+    }
+    .login-card {
+      background: rgba(21, 21, 21, 0.95);
+      border: 2px solid var(--gold);
+      border-radius: 16px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(212, 175, 55, 0.2);
+    }
+    .login-card .logo-large {
+      height: 90px;
+      margin-bottom: 20px;
+    }
+    .login-card h2 {
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .login-card .subtitle {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--gold);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--black);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+    }
+    .form-control::placeholder { color: var(--gray); }
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-login:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+    .support-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--gray-light);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-top: 20px;
+      transition: var(--transition);
+    }
+    .support-link:hover {
+      color: var(--gold);
+    }
+    .support-link i { color: #25D366; font-size: 1.1rem; }
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 12px;
+      display: none;
+    }
+    .error-msg.show { display: block; animation: shake 0.4s ease; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    /* DASHBOARD */
+    .dashboard {
+      display: none;
+      padding: 80px 0 60px;
+    }
+    .dashboard.active { display: block; }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: rgba(21, 21, 21, 0.9);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: rgba(212, 175, 55, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--gold);
+    }
+    .stat-info h4 {
+      font-size: 0.85rem;
+      color: var(--gray);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .stat-info .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .stat-info .trend {
+      font-size: 0.75rem;
+      color: var(--success);
+      margin-top: 2px;
+    }
+    
+    .reservations-list {
+      background: rgba(21, 21, 21, 0.9);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .reservations-list h3 {
+      font-size: 1.1rem;
+      color: var(--gold);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .reservation-item {
+      padding: 12px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .reservation-item:last-child { border-bottom: none; }
+    .res-details h4 {
+      font-size: 0.95rem;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .res-details p {
+      font-size: 0.8rem;
+      color: var(--gray-light);
+      line-height: 1.4;
+    }
+    .res-price {
+      font-weight: 700;
+      color: var(--gold);
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    .empty-state i {
+      font-size: 2.5rem;
+      color: var(--gold);
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+    
+    .refresh-info {
+      text-align: center;
+      color: var(--gray);
+      font-size: 0.8rem;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .refresh-info i { color: var(--gold); animation: spin 2s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    #lastUpdate {
+      font-weight: 600;
+      color: var(--gold-light);
+      font-family: monospace;
+    }
+    
+    /* MODAL CONFIRMACIÓN SALIDA */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background: linear-gradient(145deg, var(--black-card), var(--black-light));
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(212, 175, 55, 0.3);
+      animation: modalSlide 0.4s ease;
+    }
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(-20px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-icon {
+      width: 65px;
+      height: 65px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+      font-size: 1.6rem;
+      color: var(--black);
+    }
+    .modal-title {
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .modal-text {
+      color: var(--gray-light);
+      font-size: 0.95rem;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .modal-btn {
+      padding: 12px 28px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal-btn.confirm {
+      background: var(--danger);
+      color: white;
+    }
+    .modal-btn.confirm:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+    }
+    .modal-btn.cancel {
+      background: transparent;
+      border: 2px solid var(--gray);
+      color: var(--gray-light);
+    }
+    .modal-btn.cancel:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    
+    /* FOOTER */
+    .admin-footer {
+      text-align: center;
+      padding: 20px 0 30px;
+      color: var(--gray);
+      font-size: 0.8rem;
+    }
+    .admin-footer .credits {
+      color: var(--gold);
+      font-weight: 700;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .admin-footer .credits:hover {
+      color: var(--gold-light);
+    }
+    
+    /* RESPONSIVE */
+    @media (max-width: 480px) {
+      .container { padding: 0 14px; }
+      .login-card { padding: 24px 20px; }
+      .stat-card { padding: 16px; }
+      .stat-icon { width: 45px; height: 45px; font-size: 1.2rem; }
+      .stat-info .value { font-size: 1.4rem; }
+      .reservation-item { padding: 10px 0; }
+      .res-details h4 { font-size: 0.9rem; }
+      .res-details p { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Fondo difuminado -->
+  <div class="admin-bg"></div>
+  
+  <!-- Header -->
+  <header class="admin-header" id="adminHeader" style="display: none;">
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding: 0 16px;">
+      <a href="index.html" class="admin-logo">
+        <img src="https://i.postimg.cc/MGknBptS/1774959730d96c-removebg-preview.png" alt="Logo">
+        𝐀𝐝𝐦𝐢𝐧 <span>Panel</span>
+      </a>
+      <button class="admin-logout-btn" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Salir
+      </button>
+    </div>
+  </header>
+
+  <!-- Login Screen -->
+  <main class="login-screen" id="loginScreen">
+    <div class="container">
+      <div class="login-card">
+        <img src="https://i.postimg.cc/MGknBptS/1774959730d96c-removebg-preview.png" alt="Logo" class="logo-large">
+        <h2>𝐀𝐜𝐜𝐞𝐬𝐨 𝐀𝐝𝐦𝐢𝐧</h2>
+        <p class="subtitle">Panel exclusivo para el propietario y personal autorizado</p>
+        
+        <form id="loginForm">
+          <div class="form-group">
+            <label><i class="fas fa-phone"></i> Número de teléfono</label>
+            <input type="tel" class="form-control" id="phoneInput" placeholder="930569195" maxlength="9" required>
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-lock"></i> Contraseña</label>
+            <input type="password" class="form-control" id="passInput" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-login">
+            <i class="fas fa-sign-in-alt"></i> Ingresar al Panel
+          </button>
+          <p class="error-msg" id="errorMsg">
+            <i class="fas fa-exclamation-circle"></i> Número o contraseña incorrectos
+          </p>
+        </form>
+        
+        <a href="https://wa.me/51930569195?text=Hola,%20olvidé%20mi%20contraseña%20del%20panel%20de%20administración%20de%20La%20Magia%20del%20Barbero.%20Necesito%20ayuda%20para%20recuperar%20el%20acceso." 
+           target="_blank" class="support-link">
+          <i class="fab fa-whatsapp"></i> ¿Olvidaste tu contraseña? Soporte WhatsApp
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Dashboard -->
+  <main class="dashboard" id="dashboard">
+    <div class="container">
+      <!-- Estadísticas -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="stat-info">
+            <h4>Reservas Hoy</h4>
+            <div class="value" id="todayCount">0</div>
+            <div class="trend"><i class="fas fa-arrow-up"></i> Actualizado en tiempo real</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-coins"></i>
+          </div>
+          <div class="stat-info">
+            <h4>Ingresos Estimados</h4>
+            <div class="value" id="revenueCount">S/ 0</div>
+            <div class="trend"><i class="fas fa-sync-alt"></i> Cálculo automático</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-info">
+            <h4>Clientes Únicos</h4>
+            <div class="value" id="clientsCount">0</div>
+            <div class="trend"><i class="fas fa-chart-line"></i> Este mes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Reservas -->
+      <div class="reservations-list">
+        <h3><i class="fas fa-list"></i> Reservas de Hoy</h3>
+        <div id="reservationsContainer">
+          <div class="empty-state">
+            <i class="fas fa-clipboard-list"></i>
+            <p>No hay reservas registradas aún.<br>Las nuevas aparecerán aquí automáticamente.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="refresh-info">
+        <i class="fas fa-sync-alt"></i> Actualizando cada 10s • Última: <span id="lastUpdate">--:--:--</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Confirmación Salida -->
+  <div class="modal-overlay" id="logoutModal">
+    <div class="modal-content">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3 class="modal-title">¿Confirmar salida?</h3>
+      <p class="modal-text">¿Estás seguro que deseas cerrar sesión en el panel de administración? Podrás volver a ingresar en cualquier momento.</p>
+      <div class="modal-buttons">
+        <button class="modal-btn cancel" id="cancelLogout">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button class="modal-btn confirm" id="confirmLogout">
+          <i class="fas fa-check"></i> Sí, salir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="admin-footer">
+    <div class="container">
+      <p>Panel de Administración • La Magia del Barbero</p>
+      <p><a href="https://bermat-mods.onrender.com/" target="_blank" class="credits">© 𝐁𝐄𝐑𝐌𝐀𝐓-𝐂𝐎𝐃𝐄𖤍</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // ===== CONFIGURACIÓN =====
+    const ADMIN_CREDENTIALS = {
+      phone: '930569195',
+      password: 'BerMatCode'
+    };
+    const SUPPORT_WHATSAPP = '51930569195';
+    const AUTO_REFRESH_INTERVAL = 10000; // 10 segundos
+
+    // ===== ELEMENTOS DOM =====
+    const loginScreen = document.getElementById('loginScreen');
+    const dashboard = document.getElementById('dashboard');
+    const adminHeader = document.getElementById('adminHeader');
+    const loginForm = document.getElementById('loginForm');
+    const phoneInput = document.getElementById('phoneInput');
+    const passInput = document.getElementById('passInput');
+    const errorMsg = document.getElementById('errorMsg');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutModal = document.getElementById('logoutModal');
+    const cancelLogout = document.getElementById('cancelLogout');
+    const confirmLogout = document.getElementById('confirmLogout');
+    const reservationsContainer = document.getElementById('reservationsContainer');
+    const todayCountEl = document.getElementById('todayCount');
+    const revenueCountEl = document.getElementById('revenueCount');
+    const clientsCountEl = document.getElementById('clientsCount');
+    const lastUpdateEl = document.getElementById('lastUpdate');
+
+    // ===== VERIFICAR SESIÓN AL CARGAR =====
+    document.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('adminLoggedIn') === 'true') {
+        showDashboard();
+        loadReservations();
+        startAutoRefresh();
+      }
+      updateLastUpdateTime();
+    });
+
+    // ===== LOGIN =====
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const phone = phoneInput.value.trim();
+      const password = passInput.value;
+      
+      if (phone === ADMIN_CREDENTIALS.phone && password === ADMIN_CREDENTIALS.password) {
+        localStorage.setItem('adminLoggedIn', 'true');
+        localStorage.setItem('adminLoginTime', new Date().toISOString());
+        errorMsg.classList.remove('show');
+        showDashboard();
+        loadReservations();
+        startAutoRefresh();
+      } else {
+        errorMsg.classList.add('show');
+        passInput.value = '';
+        passInput.focus();
+      }
+    });
+
+    // ===== MOSTRAR DASHBOARD =====
+    function showDashboard() {
+      loginScreen.style.display = 'none';
+      dashboard.classList.add('active');
+      adminHeader.style.display = 'flex';
+    }
+
+    // ===== CARGAR RESERVAS (DESDE LOCALSTORAGE) =====
+    function loadReservations() {
+      const reservations = JSON.parse(localStorage.getItem('barberReservations') || '[]');
+      
+      if (reservations.length === 0) {
+        reservationsContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-clipboard-list"></i>
+            <p>No hay reservas registradas aún.<br>Las nuevas aparecerán aquí automáticamente.</p>
+          </div>
+        `;
+        todayCountEl.textContent = '0';
+        revenueCountEl.textContent = 'S/ 0';
+        clientsCountEl.textContent = '0';
+        return;
+      }
+
+      // Filtrar reservas de hoy
+      const today = new Date().toISOString().split('T')[0];
+      const todayReservations = reservations.filter(r => r.date === today);
+      
+      // Calcular estadísticas
+      const totalRevenue = todayReservations.reduce((sum, r) => sum + (r.price || 0), 0);
+      const uniqueClients = [...new Set(reservations.map(r => r.name.toLowerCase()))].length;
+      
+      // Actualizar contadores
+      todayCountEl.textContent = todayReservations.length;
+      revenueCountEl.textContent = `S/ ${totalRevenue}`;
+      clientsCountEl.textContent = uniqueClients;
+      
+      // Generar lista de reservas de hoy (ordenadas por hora)
+      const sortedToday = [...todayReservations].sort((a, b) => a.time.localeCompare(b.time));
+      
+      if (sortedToday.length === 0) {
+        reservationsContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-calendar-day"></i>
+            <p>No hay reservas para hoy.<br>¡Esperamos tus primeros clientes!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      
+      sortedToday.forEach(res => {
+        html += `
+          <div class="reservation-item">
+            <div class="res-details">
+              <h4>${res.name}</h4>
+              <p><i class="fas fa-cut"></i> ${res.service}</p>
+              <p><i class="fas fa-clock"></i> ${res.time} • <i class="fas fa-user"></i> ${res.professional}</p>
+              <p style="font-size:0.75rem;color:var(--gray);"><i class="fas fa-phone"></i> ${res.phone}</p>
+            </div>
+            <div class="res-price">S/ ${res.price}</div>
+          </div>
+        `;
+      });
+      
+      reservationsContainer.innerHTML = html;
+      updateLastUpdateTime();
+    }
+
+    // ===== ACTUALIZAR HORA DE ÚLTIMA ACTUALIZACIÓN (CON SEGUNDOS) =====
+    function updateLastUpdateTime() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('es-PE', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        hour12: false 
+      });
+      lastUpdateEl.textContent = timeStr;
+    }
+
+    // ===== AUTO-REFRESH CADA 10 SEGUNDOS =====
+    function startAutoRefresh() {
+      setInterval(() => {
+        loadReservations();
+      }, AUTO_REFRESH_INTERVAL);
+    }
+
+    // ===== LOGOUT CON CONFIRMACIÓN =====
+    logoutBtn.addEventListener('click', () => {
+      logoutModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    cancelLogout.addEventListener('click', closeModal);
+    
+    confirmLogout.addEventListener('click', () => {
+      localStorage.removeItem('adminLoggedIn');
+      localStorage.removeItem('adminLoginTime');
+      closeModal();
+      // Redirigir al login
+      dashboard.classList.remove('active');
+      loginScreen.style.display = 'flex';
+      adminHeader.style.display = 'none';
+      phoneInput.value = '';
+      passInput.value = '';
+    });
+
+    function closeModal() {
+      logoutModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Cerrar modal al hacer clic fuera
+    logoutModal.addEventListener('click', (e) => {
+      if (e.target === logoutModal) closeModal();
+    });
+
+    // Soporte para tecla Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && logoutModal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    // ===== UTILIDADES =====
+    // Permitir solo números en el campo de teléfono
+    phoneInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    });
+
+    // ===== ESCUCHAR CAMBIOS EN LOCALSTORAGE (PARA ACTUALIZACIÓN EN TIEMPO REAL ENTRE PESTAÑAS) =====
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'barberReservations' && localStorage.getItem('adminLoggedIn') === 'true') {
+        loadReservations();
+      }
+    });
+
+    // También escuchar eventos personalizados para misma pestaña
+    window.addEventListener('reservationCreated', () => {
+      if (localStorage.getItem('adminLoggedIn') === 'true') {
+        loadReservations();
+      }
+    });
+  </script>
+</body>
+</html>
